@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/benjaminli7/go-api-4iw3/handler"
 	"github.com/benjaminli7/go-api-4iw3/payment"
 	"github.com/benjaminli7/go-api-4iw3/product"
-	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -29,7 +30,8 @@ func main() {
 	productService := product.NewService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 
-	paymentRepository := payment.NewRepository(db)
+	broadcaster := payment.NewBroadcaster()
+	paymentRepository := payment.NewRepository(db, broadcaster)
 	paymentService := payment.NewService(paymentRepository)
 	paymentHandler := handler.NewPaymentHandler(paymentService)
 
