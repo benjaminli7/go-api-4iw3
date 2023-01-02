@@ -1,7 +1,7 @@
 package main
 
 import (
-	"io"
+	// "io"
 	"log"
 	"os"
 
@@ -48,6 +48,8 @@ func main() {
 	api.GET("/product/:id", productHandler.GetById)
 	api.PUT("/product/:id", productHandler.Update)
 	api.DELETE("/product/:id", productHandler.Delete)
+
+	api.POST("/payment", paymentHandler.Store)
 	api.GET("/payment", paymentHandler.GetAll)
 	// api.GET("/payment/stream", func(c *gin.Context) {
 	// 	ch := broadcaster.Subscribe()

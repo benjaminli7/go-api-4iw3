@@ -8,11 +8,11 @@ import (
 type Repository interface {
 	Store(payment Payment) (Payment, error)
 	GetAll() ([]Payment, error)
-	GetByID(id int) (*Payment, error)
-	Create(payment *Payment) (uint32, error)
-	Update(payment Payment) error
-	Delete(id int) error
-	Subscribe() <-chan Payment
+	// GetByID(id int) (*Payment, error)
+	// Create(payment *Payment) (uint32, error)
+	// Update(payment Payment) error
+	// Delete(id int) error
+	// Subscribe() <-chan Payment
 }
 
 type repository struct {
@@ -24,7 +24,7 @@ func NewRepository(db *gorm.DB) *repository {
 }
 
 func (r *repository) Store(payment Payment) (Payment, error) {
-	err := r.db.Create(payment).Error
+	err := r.db.Create(&payment).Error
 	if err != nil {
 		return payment, err
 	}

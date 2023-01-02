@@ -1,12 +1,9 @@
 package payment
 
-import (
-	"github.com/benjaminli7/go-api-4iw3/product"
-
-)
+import "fmt"
 
 type Service interface {
-	Store(payment Payment) (Payment, error)
+	Store(input InputPayment) (Payment, error)
 	GetAll() ([]Payment, error)
 	// GetByID(id int) (Payment, error)
 	// Update(payment Payment) error
@@ -15,22 +12,21 @@ type Service interface {
 }
 
 type service struct {
-	repository  Repository
-	broadcaster *Broadcaster
+	repository Repository
 }
 
-func NewService(r Repository, b *Broadcaster) *service {
-	return &service{r, b}
+func NewService(r Repository) *service {
+	return &service{r}
 }
-
 
 func (s *service) Store(input InputPayment) (Payment, error) {
 	var payment Payment
 	payment.ProductId = input.ProductId
+	payment.PricePaid = 4
 
-	test, err := product.Service.GetById(input.ProductId)
+	// print input.ProductId
+	fmt.Println(input.ProductId)
 
-	
 	newPayment, err := s.repository.Store(payment)
 	if err != nil {
 		return newPayment, err
