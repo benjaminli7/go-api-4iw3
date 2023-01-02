@@ -44,6 +44,8 @@ func main() {
 	api.POST("/product", productHandler.Store)
 	api.GET("/product", productHandler.GetAll)
 	api.GET("/product/:id", productHandler.GetById)
+	api.PUT("/product/:id", productHandler.Update)
+	api.DELETE("/product/:id", productHandler.Delete)
 	api.GET("/payment", paymentHandler.GetAll)
 
 	r.Run(":3000")

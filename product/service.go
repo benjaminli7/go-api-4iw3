@@ -4,6 +4,8 @@ type Service interface {
 	Store(input InputProduct) (Product, error)
 	GetAll() ([]Product, error)
 	GetById(id int) (Product, error)
+	Update(id int, inputProduct InputProduct) (Product, error)
+	Delete(id int) error
 }
 
 type service struct {
@@ -42,4 +44,22 @@ func (s *service) GetById(id int) (Product, error) {
 	}
 
 	return product, nil
+}
+
+func (s *service) Update(id int, input InputProduct) (Product, error) {
+	product, err := s.repository.Update(id, input)
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (s *service) Delete(id int) error {
+	err := s.repository.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

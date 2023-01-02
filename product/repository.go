@@ -1,7 +1,7 @@
 package product
 
 import (
-	// "errors"
+	"errors"
 	"gorm.io/gorm"
 )
 
@@ -9,6 +9,8 @@ type Repository interface {
 	Store(product Product) (Product, error)
 	GetAll() ([]Product, error)
 	GetById(id int) (Product, error)
+	Update(id int, inputProduct InputProduct) (Product, error)
+	Delete(id int) error
 }
 
 type repository struct {
@@ -46,4 +48,41 @@ func (r *repository) GetById(id int) (Product, error) {
 	}
 
 	return product, nil
+}
+
+func (r *repository) Update(id int, inputProduct InputProduct) (Product, error) {
+	product, err := r.GetById(id)
+	if err != nil {
+		return product, err
+	}
+
+	product.Name = inputProduct.Name
+	product.Price = inputProduct.Price
+
+	err = r.db.Save(&product).Error
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (r *repository) Delete(id int) error {
+	product, err := r.GetById(id)
+	if err != nil {
+		return err
+	}
+
+	
+
+	tx := r.db.Delete(product)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+		return errors.New("Product not found")
+	}
+
+	return nil
 }
