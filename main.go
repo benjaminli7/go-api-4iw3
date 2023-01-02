@@ -23,7 +23,7 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	db.AutoMigrate(&payment.Payment{}, &product.Product{})
+	db.AutoMigrate(&product.Product{}, &payment.Payment{})
 
 	productRepository := product.NewRepository(db)
 	productService := product.NewService(productRepository)
@@ -41,7 +41,9 @@ func main() {
 		})
 	})
 
+	api.POST("/product", productHandler.Store)
 	api.GET("/product", productHandler.GetAll)
+	api.GET("/product/:id", productHandler.GetById)
 	api.GET("/payment", paymentHandler.GetAll)
 
 	r.Run(":3000")

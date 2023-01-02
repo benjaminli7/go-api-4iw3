@@ -6,7 +6,9 @@ import (
 )
 
 type Repository interface {
+	Store(product Product) (Product, error)
 	GetAll() ([]Product, error)
+	GetById(id int) (Product, error)
 }
 
 type repository struct {
@@ -34,4 +36,14 @@ func (r *repository) GetAll() ([]Product, error) {
 	}
 
 	return products, nil
+}
+
+func (r *repository) GetById(id int) (Product, error) {
+	var product Product
+	err := r.db.First(&product, id).Error
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
 }
