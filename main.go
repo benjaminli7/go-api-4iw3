@@ -25,7 +25,7 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	db.AutoMigrate(&payment.Payment{}, &product.Product{})
+	db.AutoMigrate(&product.Product{}, &payment.Payment{})
 
 	productRepository := product.NewRepository(db)
 	productService := product.NewService(productRepository)
@@ -44,7 +44,11 @@ func main() {
 		})
 	})
 
+	api.POST("/product", productHandler.Store)
 	api.GET("/product", productHandler.GetAll)
+	api.GET("/product/:id", productHandler.GetById)
+	api.PUT("/product/:id", productHandler.Update)
+	api.DELETE("/product/:id", productHandler.Delete)
 	api.GET("/payment", paymentHandler.GetAll)
 	api.GET("/payment/stream", func(c *gin.Context) {
 		ch := broadcaster.Subscribe()

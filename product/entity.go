@@ -2,11 +2,10 @@ package product
 
 import (
 	"time"
-	"gorm.io/gorm"
+	// "gorm.io/gorm"
 )
 
 type Product struct {
-	gorm.Model
 	ID        uint32    `gorm:"primary_key;auto_increment" json:"id"`
 	Name      string    `gorm:"type:varchar(255);not null;unique_index" json:"name"`
 	Price     float64   `gorm:"type:float;not null" json:"price"`
