@@ -31,8 +31,7 @@ func main() {
 	productService := product.NewService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 
-	broadcaster := payment.NewBroadcaster()
-	paymentRepository := payment.NewRepository(db, broadcaster)
+	paymentRepository := payment.NewRepository(db)
 	paymentService := payment.NewService(paymentRepository)
 	paymentHandler := handler.NewPaymentHandler(paymentService)
 
@@ -50,35 +49,35 @@ func main() {
 	api.PUT("/product/:id", productHandler.Update)
 	api.DELETE("/product/:id", productHandler.Delete)
 	api.GET("/payment", paymentHandler.GetAll)
-	api.GET("/payment/stream", func(c *gin.Context) {
-		ch := broadcaster.Subscribe()
-		defer close(ch)
+	// api.GET("/payment/stream", func(c *gin.Context) {
+	// 	ch := broadcaster.Subscribe()
+	// 	defer close(ch)
 
-		c.Stream(func(w io.Writer) bool {
-			payment, ok := <-ch
-			if !ok {
-				return false
-			}
-			c.SSEvent("payment", payment)
-			return true
-		})
-	})
-	go func() {
-		clients := make(map[chan Payment]struct{})
-		for {
-			select {
-			case ch := <-b.subscribe:
-				clients[ch] = struct{}{}
-			case ch := <-b.unsubscribe:
-				delete(clients, ch)
-				close(ch)
-			case payment := <-b.payments:
-				for ch := range clients {
-					ch <- payment
-				}
-			}
-		}
-	}()
+	// 	c.Stream(func(w io.Writer) bool {
+	// 		payment, ok := <-ch
+	// 		if !ok {
+	// 			return false
+	// 		}
+	// 		c.SSEvent("payment", payment)
+	// 		return true
+	// 	})
+	// })
+	// go func() {
+	// 	clients := make(map[chan Payment]struct{})
+	// 	for {
+	// 		select {
+	// 		case ch := <-b.subscribe:
+	// 			clients[ch] = struct{}{}
+	// 		case ch := <-b.unsubscribe:
+	// 			delete(clients, ch)
+	// 			close(ch)
+	// 		case payment := <-b.payments:
+	// 			for ch := range clients {
+	// 				ch <- payment
+	// 			}
+	// 		}
+	// 	}
+	// }()
 
 	r.Run(":3000")
 }
