@@ -37,9 +37,6 @@ func (s *service) GetByID(id int) (*Payment, error) {
 }
 
 func (s *service) Create(payment Payment) (int, error) {
-	// Vérifiez ici que le "productId" existe et que le "pricePaid" est supérieur ou égal au prix du produit
-	// Si les règles ne sont pas respectées, renvoyez une erreur appropriée
-	// Si les règles sont respectées, créez le paiement en appelant la fonction "Create" de la struct "repository"
 	id := 0
 	id, err := s.repository.Create(payment)
 	if err != nil {
