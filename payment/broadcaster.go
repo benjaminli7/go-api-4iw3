@@ -1,28 +1,21 @@
 package payment
 
-import "sync"
-
 type Broadcaster struct {
-	clients map[chan<- Payment]struct{}
-	mu      sync.Mutex
+	payments    chan Payment
+	subscribe   chan chan Payment
+	unsubscribe chan chan Payment
 }
 
 func NewBroadcaster() *Broadcaster {
 	return &Broadcaster{
-		clients: make(map[chan<- Payment]struct{}),
+		payments:    make(chan Payment),
+		subscribe:   make(chan chan Payment),
+		unsubscribe: make(chan chan Payment),
 	}
 }
 
-func (b *Broadcaster) Add(c chan<- Payment) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-
-	b.clients[c] = struct{}{}
-}
-
-func (b *Broadcaster) Remove(c chan<- Payment) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-
-	delete(b.clients, c)
+func (b *Broadcaster) Subscribe() <-chan Payment {
+	ch := make(chan Payment)
+	b.subscribe <- ch
+	return ch
 }

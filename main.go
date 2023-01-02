@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"os"
 
@@ -45,6 +46,35 @@ func main() {
 
 	api.GET("/product", productHandler.GetAll)
 	api.GET("/payment", paymentHandler.GetAll)
+	api.GET("/payment/stream", func(c *gin.Context) {
+		ch := broadcaster.Subscribe()
+		defer close(ch)
+
+		c.Stream(func(w io.Writer) bool {
+			payment, ok := <-ch
+			if !ok {
+				return false
+			}
+			c.SSEvent("payment", payment)
+			return true
+		})
+	})
+	go func() {
+		clients := make(map[chan Payment]struct{})
+		for {
+			select {
+			case ch := <-b.subscribe:
+				clients[ch] = struct{}{}
+			case ch := <-b.unsubscribe:
+				delete(clients, ch)
+				close(ch)
+			case payment := <-b.payments:
+				for ch := range clients {
+					ch <- payment
+				}
+			}
+		}
+	}()
 
 	r.Run(":3000")
 }
