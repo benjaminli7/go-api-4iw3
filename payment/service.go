@@ -1,13 +1,12 @@
 package payment
 
-import "fmt"
-
 type Service interface {
 	Store(input InputPayment) (Payment, error)
 	GetAll() ([]Payment, error)
-	// GetByID(id int) (Payment, error)
-	// Update(payment Payment) error
-	// Delete(id int) error
+	GetById(id int) (Payment, error)
+	Update(id int, inputPayment InputPayment) (Payment, error)
+	Delete(id int) error
+
 	// StreamPayments(c chan<- Payment)
 }
 
@@ -21,11 +20,8 @@ func NewService(r Repository) *service {
 
 func (s *service) Store(input InputPayment) (Payment, error) {
 	var payment Payment
-	payment.ProductId = input.ProductId
-	payment.PricePaid = 4
 
-	// print input.ProductId
-	fmt.Println(input.ProductId)
+	payment.ProductId = input.ProductId
 
 	newPayment, err := s.repository.Store(payment)
 	if err != nil {
@@ -44,25 +40,32 @@ func (s *service) GetAll() ([]Payment, error) {
 	return payments, nil
 }
 
-// func (s *service) GetByID(id int) (*Payment, error) {
-// 	return s.repository.GetByID(id)
-// }
+func (s *service) GetById(id int) (Payment, error) {
+	payment, err := s.repository.GetById(id)
+	if err != nil {
+		return payment, err
+	}
 
-// func (s *service) Store(payment Payment) (uint32, error) {
-// 	p, err := s.repository.Store(payment)
-// 	if err != nil {
-// 		return 0, err
-// 	}
-// 	return p.ID, nil
-// }
+	return payment, nil
+}
 
-// func (s *service) Update(payment Payment) error {
-// 	return s.repository.Update(payment)
-// }
+func (s *service) Update(id int, input InputPayment) (Payment, error) {
+	payment, err := s.repository.Update(id, input)
+	if err != nil {
+		return payment, err
+	}
 
-// func (s *service) Delete(id int) error {
-// 	return s.repository.Delete(id)
-// }
+	return payment, nil
+}
+
+func (s *service) Delete(id int) error {
+	err := s.repository.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // func (s *service) broadcastPayment(p Payment) {
 // 	s.broadcaster.mu.Lock()

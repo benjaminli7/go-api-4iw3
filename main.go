@@ -51,6 +51,10 @@ func main() {
 
 	api.POST("/payment", paymentHandler.Store)
 	api.GET("/payment", paymentHandler.GetAll)
+	api.GET("/payment/:id", paymentHandler.GetById)
+	api.PUT("/payment/:id", paymentHandler.Update)
+	api.DELETE("/payment/:id", paymentHandler.Delete)
+
 	// api.GET("/payment/stream", func(c *gin.Context) {
 	// 	ch := broadcaster.Subscribe()
 	// 	defer close(ch)

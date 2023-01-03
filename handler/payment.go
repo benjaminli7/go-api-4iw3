@@ -4,6 +4,7 @@ import (
 	"github.com/benjaminli7/go-api-4iw3/payment"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 
@@ -64,6 +65,107 @@ func (ph *paymentHandler) GetAll(c *gin.Context) {
 		Success: true,
 		Data:    payments,
 	})
+}
+
+
+func (ph *paymentHandler) GetById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, &Response{
+			Success: false,
+			Message: "Wrong id parameter",
+			Data:    err.Error(),
+		})
+		return
+	}
+
+	payment, err := ph.paymentService.GetById(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, &Response{
+		Success: true,
+		Data:    payment,
+	})
+}
+
+func (ph *paymentHandler) Update(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, &Response{
+			Success: false,
+			Message: "Wrong id parameter",
+			Data:    err.Error(),
+		})
+		return
+	}
+
+	// Get json body
+	var input payment.InputPayment
+	err = c.ShouldBindJSON(&input)
+	if err != nil {
+		response := &Response{
+			Success: false,
+			Message: "Cannot extract JSON body",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	payment, err := ph.paymentService.Update(id, input)
+	if err != nil {
+		response := &Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := &Response{
+		Success: true,
+		Message: "Payment successfully updated",
+		Data:    payment,
+	}
+	c.JSON(http.StatusCreated, response)
+}
+
+func (ph *paymentHandler) Delete(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, &Response{
+			Success: false,
+			Message: "Wrong id parameter",
+			Data:    err.Error(),
+		})
+		return
+	}
+
+	err = ph.paymentService.Delete(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, &Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, &Response{
+		Success: true,
+		Message: "Payment successfully deleted",
+	})
+}
+
+
 
 // func (ph *paymentHandler) Stream(c *gin.Context) {
 // 	// Créez un canal pour envoyer les événements de paiement à la fonction de streaming
@@ -87,7 +189,3 @@ func (ph *paymentHandler) GetAll(c *gin.Context) {
 // 	// Bloquez la goroutine jusqu'à ce que le client se déconnecte
 // 	<-c.Writer.CloseNotify()
 // }
-
-	
-	
-}
