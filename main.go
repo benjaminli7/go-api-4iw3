@@ -1,11 +1,13 @@
 package main
 
 import (
+	// "io"
+	"log"
+	"os"
+
 	"github.com/benjaminli7/go-api-4iw3/handler"
 	"github.com/benjaminli7/go-api-4iw3/payment"
 	"github.com/benjaminli7/go-api-4iw3/product"
-	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -46,7 +48,42 @@ func main() {
 	api.GET("/product/:id", productHandler.GetById)
 	api.PUT("/product/:id", productHandler.Update)
 	api.DELETE("/product/:id", productHandler.Delete)
+
+	api.POST("/payment", paymentHandler.Store)
 	api.GET("/payment", paymentHandler.GetAll)
+	api.GET("/payment/:id", paymentHandler.GetById)
+	api.PUT("/payment/:id", paymentHandler.Update)
+	api.DELETE("/payment/:id", paymentHandler.Delete)
+
+	// api.GET("/payment/stream", func(c *gin.Context) {
+	// 	ch := broadcaster.Subscribe()
+	// 	defer close(ch)
+
+	// 	c.Stream(func(w io.Writer) bool {
+	// 		payment, ok := <-ch
+	// 		if !ok {
+	// 			return false
+	// 		}
+	// 		c.SSEvent("payment", payment)
+	// 		return true
+	// 	})
+	// })
+	// go func() {
+	// 	clients := make(map[chan Payment]struct{})
+	// 	for {
+	// 		select {
+	// 		case ch := <-b.subscribe:
+	// 			clients[ch] = struct{}{}
+	// 		case ch := <-b.unsubscribe:
+	// 			delete(clients, ch)
+	// 			close(ch)
+	// 		case payment := <-b.payments:
+	// 			for ch := range clients {
+	// 				ch <- payment
+	// 			}
+	// 		}
+	// 	}
+	// }()
 
 	r.Run(":3000")
 }
