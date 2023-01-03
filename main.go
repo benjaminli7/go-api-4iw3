@@ -1,16 +1,35 @@
 package main
 
 import (
+	"log"
+	"os"
+
+	_ "github.com/benjaminli7/go-api-4iw3/docs"
 	"github.com/benjaminli7/go-api-4iw3/handler"
 	"github.com/benjaminli7/go-api-4iw3/payment"
 	"github.com/benjaminli7/go-api-4iw3/product"
-	"log"
-	"os"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
+
+// @title           Go API 4IW3
+// @version         1.0
+// @description     Go API 4IW3  is a sample application for a university project.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:3000
+// @BasePath  /api
 
 func main() {
 	dbURL := os.Getenv("DB_URL")
@@ -47,6 +66,6 @@ func main() {
 	api.PUT("/product/:id", productHandler.Update)
 	api.DELETE("/product/:id", productHandler.Delete)
 	api.GET("/payment", paymentHandler.GetAll)
-
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Run(":3000")
 }
