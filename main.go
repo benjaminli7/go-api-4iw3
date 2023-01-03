@@ -2,6 +2,7 @@ package main
 
 import (
 	// "io"
+
 	"log"
 	"os"
 
@@ -22,7 +23,7 @@ func main() {
 
 	db, err := gorm.Open(mysql.Open(dbURL), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("DB", err.Error())
 	}
 
 	db.AutoMigrate(&product.Product{}, &payment.Payment{})
@@ -31,9 +32,10 @@ func main() {
 	productService := product.NewService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 
-	paymentRepository := payment.NewRepository(db)
+	br := payment.NewBroadcaster(10)
+	paymentRepository := payment.NewRepository(db, br)
 	paymentService := payment.NewService(paymentRepository)
-	paymentHandler := handler.NewPaymentHandler(paymentService)
+	paymentHandler := handler.NewPaymentHandler(paymentService, br)
 
 	r := gin.Default()
 	api := r.Group("/api")
@@ -49,36 +51,7 @@ func main() {
 	api.GET("/payment/:id", paymentHandler.GetById)
 	api.PUT("/payment/:id", paymentHandler.Update)
 	api.DELETE("/payment/:id", paymentHandler.Delete)
-
-	// api.GET("/payment/stream", func(c *gin.Context) {
-	// 	ch := broadcaster.Subscribe()
-	// 	defer close(ch)
-
-	// 	c.Stream(func(w io.Writer) bool {
-	// 		payment, ok := <-ch
-	// 		if !ok {
-	// 			return false
-	// 		}
-	// 		c.SSEvent("payment", payment)
-	// 		return true
-	// 	})
-	// })
-	// go func() {
-	// 	clients := make(map[chan Payment]struct{})
-	// 	for {
-	// 		select {
-	// 		case ch := <-b.subscribe:
-	// 			clients[ch] = struct{}{}
-	// 		case ch := <-b.unsubscribe:
-	// 			delete(clients, ch)
-	// 			close(ch)
-	// 		case payment := <-b.payments:
-	// 			for ch := range clients {
-	// 				ch <- payment
-	// 			}
-	// 		}
-	// 	}
-	// }()
+	api.GET("/payment/stream", paymentHandler.Stream)
 
 	r.Run(":3000")
 }
