@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -31,12 +30,12 @@ func (ph *paymentHandler) Stream(c *gin.Context) {
 			return false
 		case message := <-listener:
 			serviceMsg, ok := message.(payment.Payment)
-			fmt.Println(message)
+			// fmt.Println(message)
 			if !ok {
 				c.SSEvent("message", message)
 				return false
 			}
-			fmt.Println(message)
+			// fmt.Println(message)
 			c.SSEvent("message", serviceMsg)
 			return true
 		}
