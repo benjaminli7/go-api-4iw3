@@ -6,11 +6,14 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/benjaminli7/go-api-4iw3/docs"
 	"github.com/benjaminli7/go-api-4iw3/handler"
 	"github.com/benjaminli7/go-api-4iw3/payment"
 	"github.com/benjaminli7/go-api-4iw3/product"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -52,6 +55,6 @@ func main() {
 	api.PUT("/payment/:id", paymentHandler.Update)
 	api.DELETE("/payment/:id", paymentHandler.Delete)
 	api.GET("/payment/stream", paymentHandler.Stream)
-
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Run(":3000")
 }

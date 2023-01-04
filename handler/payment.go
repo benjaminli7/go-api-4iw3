@@ -18,6 +18,16 @@ func NewPaymentHandler(paymentService payment.Service, br payment.Broadcaster) *
 	return &paymentHandler{paymentService, br}
 }
 
+// Stream godoc
+// @Summary      Stream
+// @Description  Stream
+// @Tags         stream
+// @Accept       json
+// @Produce      json
+// @Param        q    body     array  true  "stream"
+// @Success      200  {array}   bool
+// @Failure      400  {object}  Response
+// @Router       /payment/stream [get]
 func (ph *paymentHandler) Stream(c *gin.Context) {
 	listener := make(chan interface{})
 	ph.br.Register(listener)
@@ -42,6 +52,16 @@ func (ph *paymentHandler) Stream(c *gin.Context) {
 	})
 }
 
+// PostPayment godoc
+// @Summary      Post a new payment
+// @Description  add payment
+// @Tags         payments
+// @Accept       json
+// @Produce      json
+// @Param        id   body     	int  true  "Add payment"
+// @Success      200  {object}  payment.InputPayment
+// @Failure      400  {object}  Response
+// @Router       /payment [post]
 func (ph *paymentHandler) Store(c *gin.Context) {
 	var input payment.InputPayment
 
@@ -75,6 +95,16 @@ func (ph *paymentHandler) Store(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// ListPayments godoc
+// @Summary      List payments
+// @Description  get all payments
+// @Tags         payments
+// @Accept       json
+// @Produce      json
+// @Param        q    query     string  false  "get all payments"
+// @Success      200  {array}   payment.Payment
+// @Failure      400  {object}  Response
+// @Router       /payment [get]
 func (ph *paymentHandler) GetAll(c *gin.Context) {
 	payments, err := ph.paymentService.GetAll()
 	if err != nil {
@@ -92,6 +122,16 @@ func (ph *paymentHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// ShowPayment godoc
+// @Summary      Show a payment
+// @Description  get payment by ID
+// @Tags         payments
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Payment ID"
+// @Success      200  {object}  payment.Payment
+// @Failure      400  {object}  Response
+// @Router       /payment/{id} [get]
 func (ph *paymentHandler) GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -119,6 +159,16 @@ func (ph *paymentHandler) GetById(c *gin.Context) {
 	})
 }
 
+// UpdatePayment godoc
+// @Summary      Update a payment
+// @Description  update payment by ID
+// @Tags         payments
+// @Accept       json
+// @Produce      json
+// @Param        id   body     	int  true  "update payments"
+// @Success      200  {object}  payment.InputPayment
+// @Failure      400  {object}  Response
+// @Router       /payment/{id} [PUT]
 func (ph *paymentHandler) Update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -162,6 +212,16 @@ func (ph *paymentHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// DeletePayment godoc
+// @Summary      Delete a payment
+// @Description  delete payment by ID
+// @Tags         payments
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Payment ID"
+// @Success      200  {object} 	string
+// @Failure      400  {object}  Response
+// @Router       /payment/{id} [DELETE]
 func (ph *paymentHandler) Delete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

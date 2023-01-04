@@ -23,6 +23,16 @@ func NewProductHandler(productService product.Service) *productHandler {
 	return &productHandler{productService}
 }
 
+// PostProduct godoc
+// @Summary      Post a new product
+// @Description  add product
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Param        id   body     	int  true  "Add product"
+// @Success      200  {object}  product.InputProduct
+// @Failure      400  {object}  Response
+// @Router       /product [post]
 func (ph *productHandler) Store(c *gin.Context) {
 	var input product.InputProduct
 
@@ -56,6 +66,16 @@ func (ph *productHandler) Store(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// ListProducts godoc
+// @Summary      List products
+// @Description  get all products
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Param        q    query     string  false  "get all products"
+// @Success      200  {array}   product.Product
+// @Failure      400  {object}  Response
+// @Router       /product [get]
 func (ph *productHandler) GetAll(c *gin.Context) {
 	products, err := ph.productService.GetAll()
 	if err != nil {
@@ -73,6 +93,16 @@ func (ph *productHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// ShowProduct godoc
+// @Summary      Show an product
+// @Description  get product by ID
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Product ID"
+// @Success      200  {object}  product.Product
+// @Failure      400  {object}  Response
+// @Router       /product/{id} [get]
 func (ph *productHandler) GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -100,6 +130,16 @@ func (ph *productHandler) GetById(c *gin.Context) {
 	})
 }
 
+// UpdateProduct godoc
+// @Summary      Update a product
+// @Description  update product by ID
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Param        id   body     	int  true  "update product"
+// @Success      200  {object}  product.InputProduct
+// @Failure      400  {object}  Response
+// @Router       /product/{id} [PUT]
 func (ph *productHandler) Update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -143,6 +183,16 @@ func (ph *productHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// DeleteProduct godoc
+// @Summary      Delete a product
+// @Description  delete product by ID
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Product ID"
+// @Success      200  {object} 	string
+// @Failure      400  {object}  Response
+// @Router       /product/{id} [DELETE]
 func (ph *productHandler) Delete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
