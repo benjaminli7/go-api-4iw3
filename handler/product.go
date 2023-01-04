@@ -3,9 +3,10 @@ package handler
 import (
 	"net/http"
 
+	"strconv"
+
 	"github.com/benjaminli7/go-api-4iw3/product"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 type Response struct {

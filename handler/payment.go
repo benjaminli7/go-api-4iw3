@@ -1,20 +1,45 @@
 package handler
 
 import (
-	"github.com/benjaminli7/go-api-4iw3/payment"
-	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/benjaminli7/go-api-4iw3/payment"
+	"github.com/gin-gonic/gin"
 )
-
-
 
 type paymentHandler struct {
 	paymentService payment.Service
+	br             payment.Broadcaster
 }
 
-func NewPaymentHandler(paymentService payment.Service) *paymentHandler {
-	return &paymentHandler{paymentService}
+func NewPaymentHandler(paymentService payment.Service, br payment.Broadcaster) *paymentHandler {
+	return &paymentHandler{paymentService, br}
+}
+
+func (ph *paymentHandler) Stream(c *gin.Context) {
+	listener := make(chan interface{})
+	ph.br.Register(listener)
+	defer ph.br.Unregister(listener)
+
+	clientGone := c.Request.Context().Done()
+	c.Stream(func(w io.Writer) bool {
+		select {
+		case <-clientGone:
+			return false
+		case message := <-listener:
+			serviceMsg, ok := message.(payment.Payment)
+			// fmt.Println(message)
+			if !ok {
+				c.SSEvent("message", message)
+				return false
+			}
+			// fmt.Println(message)
+			c.SSEvent("message", serviceMsg)
+			return true
+		}
+	})
 }
 
 func (ph *paymentHandler) Store(c *gin.Context) {
@@ -66,7 +91,6 @@ func (ph *paymentHandler) GetAll(c *gin.Context) {
 		Data:    payments,
 	})
 }
-
 
 func (ph *paymentHandler) GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -165,12 +189,10 @@ func (ph *paymentHandler) Delete(c *gin.Context) {
 	})
 }
 
-
-
 // func (ph *paymentHandler) Stream(c *gin.Context) {
 // 	// Créez un canal pour envoyer les événements de paiement à la fonction de streaming
 // 	eventChan := make(chan payment.Payment)
-	
+
 // 	// Créez une goroutine pour écouter les événements de paiement et les envoyer au canal
 // 	go func() {
 // 		for {
@@ -181,11 +203,11 @@ func (ph *paymentHandler) Delete(c *gin.Context) {
 // 			}
 // 		}
 // 	}()
-	
+
 // 	// Ajoutez le client au broadcaster pour recevoir les événements de paiement en temps réel
 // 	broadcaster.Add(c.Writer)
 // 	defer broadcaster.Remove(c.Writer)
-	
+
 // 	// Bloquez la goroutine jusqu'à ce que le client se déconnecte
 // 	<-c.Writer.CloseNotify()
 // }

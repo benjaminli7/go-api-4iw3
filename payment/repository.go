@@ -18,11 +18,12 @@ type Repository interface {
 }
 
 type repository struct {
-	db *gorm.DB
+	db          *gorm.DB
+	broadcaster Broadcaster
 }
 
-func NewRepository(db *gorm.DB) *repository {
-	return &repository{db}
+func NewRepository(db *gorm.DB, broadcaster Broadcaster) *repository {
+	return &repository{db, broadcaster}
 }
 
 func (r *repository) Store(payment Payment) (Payment, error) {
@@ -39,6 +40,7 @@ func (r *repository) Store(payment Payment) (Payment, error) {
 	if err != nil {
 		return payment, err
 	}
+	r.broadcaster.Submit(payment)
 	return payment, nil
 }
 
